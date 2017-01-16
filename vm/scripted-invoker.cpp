@@ -170,7 +170,7 @@ ScriptedInvoker::Cancel()
 }
 
 int
-ScriptedInvoker::Execute(cell_t* result)
+ScriptedInvoker::Execute(cell_t *result, cell_t buffer, cell_t size)
 {
   Environment* env = Environment::get();
   env->clearPendingException();
@@ -187,7 +187,11 @@ ScriptedInvoker::Execute(cell_t* result)
   // Could unintentionally leak a pending exception back to the caller,
   // which wouldn't have happened before the Great Exception Refactoring.
   ExceptionHandler eh(context_);
+  eh.Debug(!size);
+
   if (!Invoke(result)) {
+    if(size)
+      context_->StringToLocalUTF8(buffer, size, eh.Message(), NULL);
     assert(env->hasPendingException());
     return env->getPendingExceptionCode();
   }

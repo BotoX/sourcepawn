@@ -52,11 +52,11 @@ class ScriptedInvoker : public IPluginFunction
   int PushCell(cell_t cell);
   int PushCellByRef(cell_t* cell, int flags);
   int PushFloat(float number);
-  int PushFloatByRef(float* number, int flags);
-  int PushArray(cell_t* inarray, unsigned int cells, int copyback);
-  int PushString(const char* string);
-  int PushStringEx(char* buffer, size_t length, int sz_flags, int cp_flags);
-  int Execute(cell_t* result);
+  int PushFloatByRef(float *number, int flags);
+  int PushArray(cell_t *inarray, unsigned int cells, int copyback);
+  int PushString(const char *string);
+  int PushStringEx(char *buffer, size_t length, int sz_flags, int cp_flags);
+  int Execute(cell_t *result, cell_t buffer=0, cell_t size=0);
   void Cancel();
   int CallFunction(const cell_t* params, unsigned int num_params, cell_t* result);
   IPluginContext* GetParentContext();

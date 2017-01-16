@@ -204,7 +204,7 @@ class IPluginFunction : public ICallable
      * @param result    Pointer to store return value in.
      * @return        Error code, if any.
      */
-    virtual int Execute(cell_t* result) = 0;
+    virtual int Execute(cell_t *result, cell_t buffer = 0, cell_t size = 0) = 0;
 
     /**
      * @brief This function is deprecated. If invoked, it reports an error.
@@ -1671,13 +1671,15 @@ class ExceptionHandler
   public:
     ExceptionHandler(ISourcePawnEngine2* api)
      : env_(api->Environment()),
-       catch_(true)
+       catch_(true),
+       debug_(true)
     {
         env_->EnterExceptionHandlingScope(this);
     }
     ExceptionHandler(IPluginContext* ctx)
      : env_(ctx->APIv2()->Environment()),
-       catch_(true)
+       catch_(true),
+       debug_(true)
     {
         env_->EnterExceptionHandlingScope(this);
     }
@@ -1705,7 +1707,15 @@ class ExceptionHandler
         return env_->GetPendingExceptionMessage(this);
     }
 
-  private:
+    bool Debug() const {
+        return debug_;
+    }
+
+    void Debug(bool debug) {
+        debug_ = debug;
+    }
+
+   private:
     // Don't allow heap construction.
     ExceptionHandler(const ExceptionHandler& other);
     void operator =(const ExceptionHandler& other);
@@ -1719,6 +1729,9 @@ class ExceptionHandler
   protected:
     // If true, the exception will be swallowed.
     bool catch_;
+
+    // If true, the exception will be propagated to the debugger.
+    bool debug_;
 };
 
 // @brief An implementation of ExceptionHandler that simply collects
@@ -1730,11 +1743,13 @@ class DetectExceptions : public ExceptionHandler
      : ExceptionHandler(api)
     {
         catch_ = false;
+        debug_ = true;
     }
     DetectExceptions(IPluginContext* ctx)
      : ExceptionHandler(ctx)
     {
         catch_ = false;
+        debug_ = true;
     }
 };
 }; // namespace SourcePawn
