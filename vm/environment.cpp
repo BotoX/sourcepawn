@@ -428,8 +428,8 @@ Environment::DispatchReport(const ErrorReport& report)
     UTIL_Format(exception_message_, sizeof(exception_message_), "%s", report.Message());
   }
 
-  // For now, we always report exceptions even if they might be handled.
-  if (debugger_)
+  // Do not report exceptions if the ExceptionHandler doesn't want us to.
+  if (debugger_ && (!eh_top_ || eh_top_->Debug()))
     debugger_->ReportError(report, iter);
 
   // See if the plugin is being debugged
